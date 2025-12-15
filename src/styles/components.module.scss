@@ -1,0 +1,29 @@
+.sidebar {
+  width: 200px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  border-right: 1px solid #000000;
+  box-sizing: border-box;
+  padding: 40px;
+  row-gap: 10px;
+  > a {
+    width: 100%;
+    cursor: pointer;
+    > p {
+      font-size: 30px;
+      color: lightgray;
+      display: inline-block;
+      transition: transform 0.3s ease;
+      transform: scale(1);
+      &:hover {
+        transform: scale(1.1);
+      }
+      &.current {
+        color: #000000;
+      }
+    }
+  }
+}
