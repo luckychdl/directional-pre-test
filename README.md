@@ -9,10 +9,10 @@ Cursor 기반 페이지네이션과 TanStack Table을 활용한 게시판 서비
 
 ### 1. 패키지 설치
 
-```bash
+````bash
 npm install
 # 또는
-yarn install
+yarn install```
 
 2. 환경 변수 설정
 
@@ -23,15 +23,23 @@ yarn install
 별도의 환경 변수 설정 없이 바로 실행할 수 있습니다.
 
 예시:
+````
+
 NEXT_PUBLIC_API_BASE_URL=http://localhost:3000
 NEXTAUTH_SECRET=directional-pre-test
 
+```
 3. 개발 서버 실행
+```
+
 npm run dev
+
 # 또는
+
 yarn dev
 
-👉 브라우저에서 http://localhost:3000 접속
+```
+👉 브라우저에서 http://localhost:3000 접속 (필수)
 
 🛠 사용한 기술 스택
 
