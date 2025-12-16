@@ -11,7 +11,7 @@ export default function Sidebar() {
           POST
         </p>
       </Link>
-      <Link href={`/chart`}>
+      <Link href={`/chart?type=바차트`}>
         <p className={pathname.startsWith("/chart") ? styles.current : ""}>
           CHART
         </p>

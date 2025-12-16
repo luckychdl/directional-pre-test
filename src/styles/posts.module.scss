@@ -54,6 +54,13 @@
   .table_scroll {
     width: 100%;
     overflow-x: auto;
+    &.empty {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+    }
   }
   .columnToggle {
     width: 100%;
@@ -115,6 +122,9 @@
     border: 1px solid black;
     border-radius: 12px;
     overflow: hidden;
+    > .table_scroll {
+      height: 100%;
+    }
   }
   table {
     width: 100%;
@@ -173,6 +183,14 @@
       -webkit-line-clamp: 3; // 3줄까지만 보여줌
       -webkit-box-orient: vertical;
       overflow: hidden;
+    }
+    .delete_btn {
+      border: none;
+      background-color: black;
+      color: white;
+      min-height: 24px;
+      border-radius: 4px;
+      width: 44px;
     }
   }
 }
@@ -371,4 +389,7 @@
       }
     }
   }
+}
+.bottomSentinel {
+  height: 1px;
 }

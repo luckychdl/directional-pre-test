@@ -1,6 +1,11 @@
 "use client";
-import { GET_POSTS_LIST } from "@/libs/post";
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { DELETE_ALL_POST, DELETE_POST, GET_POSTS_LIST } from "@/libs/post";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import styles from "../../../styles/posts.module.scss";
 import {
   ColumnDef,
@@ -14,6 +19,8 @@ import { PostItems, PostsList } from "@/app/types/post";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MdCheckBox, MdCheckBoxOutlineBlank } from "react-icons/md";
 import { useRouter } from "next/navigation";
+import Spinner from "@/components/spinner";
+import { useSession } from "next-auth/react";
 export default function PostListPage() {
   const router = useRouter();
   const [postFilterData, setPostFilterData] = useState({
@@ -36,7 +43,7 @@ export default function PostListPage() {
     initialPageParam: undefined as string | undefined, // nextCursor
     queryFn: ({ pageParam }) =>
       GET_POSTS_LIST({
-        limit: 10,
+        limit: 5,
         order: postFilterData?.order ?? null,
         category: postFilterData?.category ?? null,
         sort: postFilterData?.sort ?? null,
@@ -46,7 +53,23 @@ export default function PostListPage() {
     getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined, // ✅ 다음 커서
     retry: 0,
   });
-
+  const queryClient = useQueryClient();
+  const deleteMutation = useMutation({
+    mutationKey: ["deletePost"],
+    mutationFn: (id: string) => DELETE_POST(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["postsList"] });
+      alert("삭제되었습니다.");
+    },
+  });
+  const deleteAllMutation = useMutation({
+    mutationKey: ["deleteAllPost"],
+    mutationFn: () => DELETE_ALL_POST(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["postsList"] });
+      alert("삭제되었습니다.");
+    },
+  });
   // ✅ 여러 페이지 items를 한 배열로 합치기
   const tableData: PostItems[] = useMemo(() => {
     return data?.pages.flatMap((p) => p.items) ?? [];
@@ -73,8 +96,26 @@ export default function PostListPage() {
         cell: ({ getValue }) => (getValue<string[]>() ?? []).join(", "),
       },
       { accessorKey: "createdAt", header: "시간", size: 160 },
+      {
+        id: "delete", // accessorKey 대신 id 사용
+        header: "삭제",
+        size: 100,
+        cell: ({ row }) => (
+          <button
+            className={styles.delete_btn}
+            onClick={(e) => {
+              e.stopPropagation(); // 행 클릭 방지
+              if (confirm("게시물을 삭제하시겠습니까?")) {
+                deleteMutation.mutate(String(row.original.id));
+              }
+            }}
+          >
+            삭제
+          </button>
+        ),
+      },
     ],
-    []
+    [deleteMutation]
   );
 
   // ✅ 리사이즈 상태를 외부로 빼서 컨트롤(가장 안정적)
@@ -122,6 +163,10 @@ export default function PostListPage() {
     io.observe(el);
     return () => io.disconnect();
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+
+  if (isLoading) {
+    return <Spinner size="large" />;
+  }
   return (
     <div className={styles.post_container}>
       <div className={styles.table_header}>
@@ -163,73 +208,93 @@ export default function PostListPage() {
 
       <div className={styles.columnToggle}>
         <div>
-          {table.getAllLeafColumns().map((column) => {
-            const isVisible = column.getIsVisible();
+          {table
+            .getAllLeafColumns()
+            .filter((v) => v.id !== "delete")
+            .map((column) => {
+              const isVisible = column.getIsVisible();
 
-            return (
-              <button
-                key={column.id}
-                type="button"
-                className={styles.columnToggleItem}
-                onClick={() => column.toggleVisibility()}
-              >
-                {isVisible ? (
-                  <MdCheckBox size={20} />
-                ) : (
-                  <MdCheckBoxOutlineBlank size={20} />
-                )}
-                <span>{String(column.columnDef.header)}</span>
-              </button>
-            );
-          })}
+              return (
+                <button
+                  key={column.id}
+                  type="button"
+                  className={styles.columnToggleItem}
+                  onClick={() => column.toggleVisibility()}
+                >
+                  {isVisible ? (
+                    <MdCheckBox size={20} />
+                  ) : (
+                    <MdCheckBoxOutlineBlank size={20} />
+                  )}
+                  <span>{String(column.columnDef.header)}</span>
+                </button>
+              );
+            })}
         </div>
-        <button>전체삭제</button>
+        <button
+          onClick={() => {
+            if (confirm("게시물을 전체 삭제하시겠습니까?")) {
+              deleteAllMutation.mutate();
+            }
+          }}
+        >
+          전체삭제
+        </button>
         <button onClick={() => router.push(`/post/write`)}>게시글 작성</button>
       </div>
       <div className={styles.table_container}>
-        <div className={styles.table_scroll}>
-          <table>
-            <thead>
-              {table.getHeaderGroups().map((hg) => (
-                <tr key={hg.id}>
-                  {hg.headers.map((header) => (
-                    <th key={header.id} style={{ width: header.getSize() }}>
-                      {flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
+        <div
+          className={`${styles.table_scroll} ${
+            table.getRowModel().rows.length > 0 ? null : styles.empty
+          }`}
+        >
+          {table.getRowModel().rows.length > 0 ? (
+            <table>
+              <thead>
+                {table.getHeaderGroups().map((hg) => (
+                  <tr key={hg.id}>
+                    {hg.headers.map((header) => (
+                      <th key={header.id} style={{ width: header.getSize() }}>
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
 
-                      {header.column.getCanResize() && (
-                        <div
-                          onMouseDown={header.getResizeHandler()}
-                          onTouchStart={header.getResizeHandler()}
-                          className={styles.resizeHandle}
-                        />
-                      )}
-                    </th>
-                  ))}
-                </tr>
-              ))}
-            </thead>
+                        {header.column.getCanResize() && (
+                          <div
+                            onMouseDown={header.getResizeHandler()}
+                            onTouchStart={header.getResizeHandler()}
+                            className={styles.resizeHandle}
+                          />
+                        )}
+                      </th>
+                    ))}
+                  </tr>
+                ))}
+              </thead>
 
-            <tbody>
-              {table.getRowModel().rows.map((row) => (
-                <tr key={row.id}>
-                  {row.getVisibleCells().map((cell) => (
-                    <td
-                      key={cell.id}
-                      onClick={() => router.push(`/post/write?id=${row.id}`)}
-                    >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+              <tbody>
+                {table.getRowModel().rows.map((row) => (
+                  <tr key={row.id}>
+                    {row.getVisibleCells().map((cell) => (
+                      <td
+                        key={cell.id}
+                        onClick={() => router.push(`/post/write?id=${row.id}`)}
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <p>등록된 게시물이 없습니다.</p>
+          )}
+          <div ref={bottomRef} className={styles.bottomSentinel} />
         </div>
       </div>
     </div>

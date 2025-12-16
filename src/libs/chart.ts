@@ -1,18 +1,9 @@
 import instance from "@/app/functions/axiosInstance";
-import { cleanParams } from "@/app/functions/cleanParams";
-import { PostData } from "@/app/post/write/page";
-import { PostRequestData } from "@/app/types/post";
 import axios from "axios";
 
-export async function GET_POSTS_LIST(data: PostRequestData) {
+export async function GET_COFFEE_BRANDS() {
   try {
-    const params = cleanParams({ ...data });
-    console.log(params);
-    const res = await instance.get(`/posts`, {
-      params: {
-        ...params,
-      },
-    });
+    const res = await instance.get(`/mock/top-coffee-brands`);
     if (res.status === 200) {
       return res.data;
     } else {
@@ -27,47 +18,10 @@ export async function GET_POSTS_LIST(data: PostRequestData) {
     throw err;
   }
 }
-export async function POST_POSTS(data: PostData) {
+
+export async function GET_SNACK_BRANDS() {
   try {
-    const res = await instance.post(`/posts`, {
-      ...data,
-    });
-    if (res.status === 201) {
-      return alert("게시물이 등록되었습니다.");
-    } else {
-      throw new Error(`Error: ${res.status} - ${res.statusText}`);
-    }
-  } catch (err: unknown) {
-    if (axios.isAxiosError(err)) {
-      console.error("게시물 등록 에러:", err.response?.data);
-    } else {
-      console.error("알 수 없는 에러:", err);
-    }
-    throw err;
-  }
-}
-export async function PATCH_POSTS(data: PostData) {
-  try {
-    const res = await instance.patch(`/posts/${data?.id}`, {
-      ...data,
-    });
-    if (res.status === 200) {
-      return alert("게시물이 수정되었습니다.");
-    } else {
-      throw new Error(`Error: ${res.status} - ${res.statusText}`);
-    }
-  } catch (err: unknown) {
-    if (axios.isAxiosError(err)) {
-      console.error("게시물 수정 에러:", err.response?.data);
-    } else {
-      console.error("알 수 없는 에러:", err);
-    }
-    throw err;
-  }
-}
-export async function GET_POST_DETAIL(id: string) {
-  try {
-    const res = await instance.get(`/posts/${id}`);
+    const res = await instance.get(`/mock/popular-snack-brands`);
     if (res.status === 200) {
       return res.data;
     } else {
@@ -82,9 +36,9 @@ export async function GET_POST_DETAIL(id: string) {
     throw err;
   }
 }
-export async function DELETE_POST(id: string) {
+export async function GET_MOOD_TREND() {
   try {
-    const res = await instance.delete(`/posts/${id}`);
+    const res = await instance.get(`/mock/weekly-mood-trend`);
     if (res.status === 200) {
       return res.data;
     } else {
@@ -92,16 +46,16 @@ export async function DELETE_POST(id: string) {
     }
   } catch (err: unknown) {
     if (axios.isAxiosError(err)) {
-      console.error("게시물 삭제 에러:", err.response?.data);
+      console.error("게시물 조회 에러:", err.response?.data);
     } else {
       console.error("알 수 없는 에러:", err);
     }
     throw err;
   }
 }
-export async function DELETE_ALL_POST() {
+export async function GET_WORKOUT_TREND() {
   try {
-    const res = await instance.delete(`/posts`);
+    const res = await instance.get(`/mock/weekly-workout-trend`);
     if (res.status === 200) {
       return res.data;
     } else {
@@ -109,7 +63,41 @@ export async function DELETE_ALL_POST() {
     }
   } catch (err: unknown) {
     if (axios.isAxiosError(err)) {
-      console.error("게시물 삭제 에러:", err.response?.data);
+      console.error("게시물 조회 에러:", err.response?.data);
+    } else {
+      console.error("알 수 없는 에러:", err);
+    }
+    throw err;
+  }
+}
+export async function GET_COFFEE_CONSUMPTION() {
+  try {
+    const res = await instance.get(`/mock/coffee-consumption`);
+    if (res.status === 200) {
+      return res.data;
+    } else {
+      throw new Error(`Error: ${res.status} - ${res.statusText}`);
+    }
+  } catch (err: unknown) {
+    if (axios.isAxiosError(err)) {
+      console.error("게시물 조회 에러:", err.response?.data);
+    } else {
+      console.error("알 수 없는 에러:", err);
+    }
+    throw err;
+  }
+}
+export async function GET_SNACK_IMPACT() {
+  try {
+    const res = await instance.get(`/mock/snack-impact`);
+    if (res.status === 200) {
+      return res.data;
+    } else {
+      throw new Error(`Error: ${res.status} - ${res.statusText}`);
+    }
+  } catch (err: unknown) {
+    if (axios.isAxiosError(err)) {
+      console.error("게시물 조회 에러:", err.response?.data);
     } else {
       console.error("알 수 없는 에러:", err);
     }

@@ -26,6 +26,7 @@ yarn install
 예시:
 
 ```
+NEXT_PUBLIC_API_BASE_URL='https://fe-hiring-rest-api.vercel.app'
 NEXT_PUBLIC_API_BASE_URL=http://localhost:3000
 NEXTAUTH_SECRET=directional-pre-test
 ```
@@ -124,6 +125,109 @@ UI / UX
 • Server Component + Client Component 역할 분리  
 • 실무에서 바로 활용 가능한 테이블 UX 구성
 
+📊 데이터 시각화 (Chart)
+
+본 프로젝트는 ECharts 기반 데이터 시각화 과제를 포함하고 있으며,  
+다양한 차트 유형과 인터랙션 요구사항을 충실히 구현하였습니다.
+
+🧱 사용 라이브러리  
+ • echarts  
+ • echarts-for-react  
+ • React + TypeScript 기반 구성  
+ • React Query로 데이터 패칭 관리
+
+⸻
+
+1️⃣ 바 차트 / 도넛 차트
+
+사용 API  
+ • /mock/weekly-mood-trend  
+ • /mock/popular-snack-brands
+
+구현 차트  
+ • 바 차트 (Bar Chart)  
+ • 도넛 차트 (Donut Chart)
+
+구현 내용  
+ • 데이터별 차트 2종씩 구현 (총 4개 차트)  
+ • 범례(Legend) 표시  
+ • 범례 클릭 시 데이터 보이기 / 숨기기  
+ • 컬러 피커를 통한 시리즈 색상 변경  
+ • 도넛 차트의 경우 주간 데이터 합산 후 시각화
+
+⸻
+
+2️⃣ 스택형 바 차트 / 스택형 면적 차트
+
+사용 API  
+ • /mock/weekly-mood-trend  
+ • /mock/weekly-workout-trend
+
+구현 차트  
+ • 스택형 바 차트 (Stacked Bar)  
+ • 스택형 면적 차트 (Stacked Area)
+
+구현 내용  
+ • X축: week  
+ • Y축: 백분율(%)  
+ • 항목별 누적(Stacked) 표현  
+ • Mood: happy, tired, stressed  
+ • Workout: running, cycling, stretching  
+ • 데이터별 차트 2종씩 구현 (총 4개 차트)  
+ • 범례 표시 및 시리즈 토글 지원
+
+⸻
+
+3️⃣ 멀티라인 차트 (Dual Y-Axis)
+
+사용 API  
+ • /mock/coffee-consumption  
+ • /mock/snack-impact
+
+구현 차트  
+ • 멀티라인 차트 (Multi-line Chart)  
+ • 듀얼 Y축 (Left / Right)
+
+구현 내용  
+ • X축  
+ • 커피 섭취량(잔/일)  
+ • 스낵 수  
+ • 왼쪽 Y축  
+ • 버그 수(bugs)  
+ • 회의 불참(meetingsMissed)  
+ • 오른쪽 Y축  
+ • 생산성(productivity)  
+ • 사기(morale)  
+ • 팀/부서별 2개의 라인  
+ • 실선 + 원형 마커: 버그 수 / 회의 불참  
+ • 점선 + 사각 마커: 생산성 / 사기  
+ • 동일 팀(부서)은 동일 색상 유지  
+ • 컬러 피커를 통한 팀별 색상 변경  
+ • 데이터 포인트 호버 시  
+ • 해당 팀의 데이터만 Tooltip에 표시
+
+⸻
+
+4️⃣ 공통 차트 인터랙션  
+ • Legend(범례) 필수 표시  
+ • 범례 클릭으로 데이터 표시/숨김  
+ • 색상 변경 기능 제공  
+ • Hover 기반 Tooltip 커스터마이징  
+ • Chart 타입별 컴포넌트 분리  
+ • BarChart  
+ • DonutChart  
+ • StackBarChart  
+ • AreaChart  
+ • MultiLineChart
+
+⸻
+
+📌 차트 설계 포인트  
+ • React Query를 활용한 데이터 패칭 및 캐싱  
+ • ECharts 옵션을 useMemo로 최적화  
+ • 시리즈 색상 state 분리로 차트 간 데이터 충돌 방지  
+ • Tooltip을 커스터마이징하여 호버된 팀 데이터만 표시  
+ • 실무에서 바로 활용 가능한 데이터 시각화 UX 구성  
 📄 기타
 
 본 프로젝트는 과제 테스트 목적으로 제작되었습니다.  
